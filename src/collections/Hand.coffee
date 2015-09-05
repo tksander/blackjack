@@ -5,8 +5,14 @@ class window.Hand extends Backbone.Collection
 
   hit: ->
     @add(@deck.pop())
+
+    # player busted
+    if @minScore() > 21
+      @trigger 'gameOver', @       
     @last()
 
+  stand: ->
+    @trigger 'stand', @
 
   hasAce: -> @reduce (memo, card) ->
     memo or card.get('value') is 1
@@ -21,5 +27,8 @@ class window.Hand extends Backbone.Collection
     # Usually, that array contains one element. That is the only score.
     # when there is an ace, it offers you two scores - the original score, and score + 10.
     [@minScore(), @minScore() + 10 * @hasAce()]
+
+  flipBottom: -> 
+    @at(0).flip()
 
 

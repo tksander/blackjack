@@ -7,6 +7,7 @@ class window.CardView extends Backbone.View
 
   render: ->
     @$el.children().detach()
+    # debugger;
     @$el.html @template @model.attributes
     @$el.addClass 'covered' unless @model.get 'revealed'
 
