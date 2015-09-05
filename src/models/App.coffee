@@ -9,9 +9,12 @@ class window.App extends Backbone.Model
     playerScore: 0
     dealerScore: 0
 
-  redeal: -> 
-    @set 'playerHand', ((@get 'deck').dealPlayer())
-    @set 'dealerHand', ((@get 'deck').dealDealer())
+  redeal: ->
+    deck = (@get 'deck')
+    if deck.length <= 10
+      deck.reshuffle()
+    @set 'playerHand', (deck.dealPlayer())
+    @set 'dealerHand', (deck.dealDealer())
     (@get 'playerHand').on 'stand', @dealerPlay, @
     (@get 'playerHand').on 'gameOver', @gameOver, @
     @trigger 'redeal', @
@@ -27,26 +30,30 @@ class window.App extends Backbone.Model
     @gameOver()
 
   gameOver: -> 
-    playerScore = (@get 'playerHand').minScore()
-    dealerScore = (@get 'dealerHand').minScore()
-
-    if playerScore > 21 then @playerWon()
-    else if dealerScore > 21 then @dealerWon()
+    playerHighScore = (@get 'playerHand').scores()[1]
+    dealerHighScore = (@get 'dealerHand').scores()[1]
+    playerMinScore = (@get 'playerHand').minScore()
+    dealerMinScore = (@get 'dealerHand').minScore()
+    playerScore = if playerHighScore > 21 then playerMinScore else playerHighScore
+    dealerScore = if dealerHighScore > 21 then dealerMinScore else dealerHighScore
+    if playerScore > 21 then @dealerWon()
+    else if dealerScore > 21 then @playerWon()
     else if playerScore > dealerScore then @playerWon()
     else if dealerScore > playerScore then @dealerWon()
     else if dealerScore == playerScore  
       @playerWon()
       @dealerWon()
+    # alert "player score :   #{@get 'playerScore' }"
+    # alert "dealer score : #{@get 'dealerScore' }"
     @redeal
 
   playerWon: -> 
-    @set 'playerScore', @get 'playerScore' + 1
+    @set 'playerScore', (@get 'playerScore') + 1
 
   dealerWon: ->
-    @set 'dealerScore', @get 'dealerScore' + 1
+    @set 'dealerScore', (@get 'dealerScore') + 1
 
   checkForBlackjack: ->
-    alert('blackjack!')
     playerScore = (@get 'playerHand').scores()[1]
     if playerScore == 21 then (@get 'playerHand').stand()
 
