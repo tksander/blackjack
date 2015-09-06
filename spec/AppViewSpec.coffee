@@ -9,10 +9,10 @@ describe 'AppView', ->
     appView = new AppView(model: new App())
 
   describe 'render', ->
-    it 'should render when the app redeals', ->
+    it 'should render when the app startGames', ->
       AppView.prototype.render.reset()
       expect(appView.render).to.not.have.been.called
-      appView.model.redeal()
+      appView.model.startGame()
       expect(appView.render).to.have.been.called
     it 'should render on initialization', ->
       expect(appView.render).to.have.been.called

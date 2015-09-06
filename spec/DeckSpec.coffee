@@ -33,7 +33,7 @@ describe 'deck', ->
         newCardArr.push card 
       deck.reset newCardArr
       app.set 'deck', deck
-      app.redeal()
+      app.startGame()
       (app.get 'playerHand').stand()
       expect(app.dealerPlay).to.have.been.called
       expect((app.get 'dealerHand').at(0).get('revealed')).to.be.true
@@ -46,7 +46,7 @@ describe 'deck', ->
         newCardArr.push card 
       deck.reset newCardArr
       app.set 'deck', deck
-      app.redeal()
+      app.startGame()
       (app.get 'playerHand').stand()
       expect(app.dealerPlay).to.have.been.called
       expect((app.get 'dealerHand').length).to.equal(2)
@@ -64,7 +64,7 @@ describe 'deck', ->
         newCardArr.push card 
       deck.reset newCardArr
       app.set 'deck', deck
-      app.redeal()
+      app.startGame()
       
       expect((app.get 'playerHand').stand).to.have.been.called
       # expect((app.get 'dealerHand').length).to.equal(2)

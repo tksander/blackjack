@@ -3,22 +3,40 @@
 class window.App extends Backbone.Model
   initialize: ->
     @set 'deck', deck = new Deck()
-    @redeal()
+    @newRound()
+    # @startGame()
 
   defaults: 
     playerScore: 0
     dealerScore: 0
+    playerMoney: 25000
+    betMoney: 0
 
-  redeal: ->
+  newRound: -> 
     deck = (@get 'deck')
-    if deck.length <= 10
-      deck.reshuffle()
-    @set 'playerHand', (deck.dealPlayer())
-    @set 'dealerHand', (deck.dealDealer())
+    @set 'playerHand', new Hand [], deck, false
+    @set 'dealerHand', new Hand [], deck, true
     (@get 'playerHand').on 'stand', @dealerPlay, @
     (@get 'playerHand').on 'gameOver', @gameOver, @
-    @trigger 'redeal', @
-    @checkForBlackjack()
+    (@get 'playerHand').on 'bet', @bet, @
+    @trigger 'newRound', @
+
+  startGame: ->
+    if (@get 'betMoney') > 0 
+      deck = (@get 'deck')
+      if deck.length <= 10
+        deck.reshuffle()
+      @set 'playerHand', (deck.dealPlayer())
+      @set 'dealerHand', (deck.dealDealer())
+      (@get 'playerHand').on 'stand', @dealerPlay, @
+      (@get 'playerHand').on 'gameOver', @gameOver, @
+      (@get 'playerHand').on 'bet', @bet, @
+
+      @trigger 'startGame', @
+      @checkForBlackjack()
+      @set 'gameInProgress', true
+    else
+      alert('Cannot start game, no money has been bet.')        
 
   events: 
     'gameOver': -> alert('game over!')
@@ -41,22 +59,47 @@ class window.App extends Backbone.Model
     else if playerScore > dealerScore then @playerWon()
     else if dealerScore > playerScore then @dealerWon()
     else if dealerScore == playerScore  
-      @playerWon()
-      @dealerWon()
+      null
+      # @playerWon()
+      # @dealerWon()
     # alert "player score :   #{@get 'playerScore' }"
     # alert "dealer score : #{@get 'dealerScore' }"
-    @redeal
+    @startGame
 
   playerWon: -> 
     @set 'playerScore', (@get 'playerScore') + 1
+    @set 'playerMoney', (@get 'playerMoney') + (@get 'betMoney') * 2
+    @set 'betMoney', 0
+    @set 'gameInProgress', false
 
   dealerWon: ->
     @set 'dealerScore', (@get 'dealerScore') + 1
+    @set 'betMoney', 0
+    @set 'gameInProgress', false
 
   checkForBlackjack: ->
     playerScore = (@get 'playerHand').scores()[1]
     if playerScore == 21 then (@get 'playerHand').stand()
 
+  playerHit: ->
+    if not @get 'gameInProgress'
+      alert('Cannot hit, game has not started!')
+    else 
+      (@get 'playerHand').hit()
 
+  playerStand: ->
+    if not @get 'gameInProgress'
+      alert('Cannot stand, game has not started!')
+    else
+      (@get 'playerHand').stand()
 
-  
+  bet: (money)->
+    if @get 'gameInProgress' 
+      alert('Game in progress, you cannot bet.')
+    else if (@get 'playerMoney') is 0
+      alert('You have no more money.')
+    else
+      @set 'betMoney', (@get 'playerMoney') + (@get 'betMoney')
+      @set 'playerMoney', 0
+      
+      

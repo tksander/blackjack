@@ -3,7 +3,7 @@ expect = chai.expect
 
 describe 'AppModel', ->
   sinon.spy Deck.prototype, 'reshuffle'
-  # sinon.spy App.prototype, 'redeal'
+  # sinon.spy App.prototype, 'startGame'
   app = null
   deck = null
 
@@ -22,7 +22,7 @@ describe 'AppModel', ->
         newCardArr.push card 
       deck.reset newCardArr
       app.set 'deck', deck
-      app.redeal()
+      app.startGame()
       # check if reshuffle is called
       expect(app.get('deck').reshuffle).to.have.been.called
       assert.strictEqual deck.length, 100

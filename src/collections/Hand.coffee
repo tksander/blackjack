@@ -8,11 +8,14 @@ class window.Hand extends Backbone.Collection
 
     # player busted
     if @minScore() > 21
-      @trigger 'gameOver', @       
+      @trigger 'gameOver'      
     @last()
 
   stand: ->
-    @trigger 'stand', @
+    @trigger 'stand'
+
+  betMoney: (money)->
+    @trigger 'bet', money
 
   hasAce: -> @reduce (memo, card) ->
     memo or card.get('value') is 1
